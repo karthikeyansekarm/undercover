@@ -73,15 +73,15 @@ Builds the SQLite schema, the seed from `data/`, and the read operations: `list_
 
 Builds `start_claim`, `record_step`, `record_decision`, `pay_claim` and `sign_off`, with the state changes and payment rules above. Why now: the rules must exist, and be tested, before an agent can exercise them.
 
-- [ ] Tests cover each state change: `waiting` to `in_progress` to `decided` (decline, refer, approve at or under $1,000) and to `awaiting_signoff` (approve over $1,000) and then `decided` on sign-off
-- [ ] Test: an approval of $1,000.00 exactly can be paid at once; $1,000.01 cannot
-- [ ] Test: `pay_claim` on a claim awaiting sign-off returns 409 and records no payment
-- [ ] Test: `pay_claim` returns 409 for a declined or referred claim, a claim with no decision, a wrong amount, or a second payment
-- [ ] Test: `sign_off` pays the approved payout, records the handler, and returns 409 on a claim not awaiting sign-off
-- [ ] Test: `record_decision` rejects a payout above 0 on a decline or refer (422), and a second decision (409)
-- [ ] Test: steps come back from `get_claim` in the order they were recorded
-- [ ] By hand with `curl` against the dev server: approve CLM-1001 at $1,250, `pay_claim` returns 409 "Payout over $1,000.00 needs a handler's sign-off"; `sign_off` with HND-01 returns the claim as `decided` with a payment of $1,250.00
-- [ ] `npm run check:python` passes, coverage at or above 80%
+- [x] Tests cover each state change: `waiting` to `in_progress` to `decided` (decline, refer, approve at or under $1,000) and to `awaiting_signoff` (approve over $1,000) and then `decided` on sign-off
+- [x] Test: an approval of $1,000.00 exactly can be paid at once; $1,000.01 cannot
+- [x] Test: `pay_claim` on a claim awaiting sign-off returns 409 and records no payment
+- [x] Test: `pay_claim` returns 409 for a declined or referred claim, a claim with no decision, a wrong amount, or a second payment
+- [x] Test: `sign_off` pays the approved payout, records the handler, and returns 409 on a claim not awaiting sign-off
+- [x] Test: `record_decision` rejects a payout above 0 on a decline or refer (422), and a second decision (409)
+- [x] Test: steps come back from `get_claim` in the order they were recorded
+- [x] By hand with `curl` against the dev server: approve CLM-1001 at $1,250, `pay_claim` returns 409 "Payout over $1,000.00 needs a handler's sign-off"; `sign_off` with HND-01 returns the claim as `decided` with a payment of $1,250.00
+- [x] `npm run check:python` passes, coverage at or above 80%
 
 ## Phase 3: The UnderCover Agent
 
