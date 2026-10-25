@@ -2,14 +2,16 @@
 
 import json
 import sqlite3
+import uuid
 from collections.abc import AsyncIterator, Iterator
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Any
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException
 
+from agent import main as agent
 from backend import db
 from backend.models import (
     Claim,
@@ -21,6 +23,7 @@ from backend.models import (
     Payment,
     PaymentInput,
     Policy,
+    RunStarted,
     SignOffInput,
     StartInput,
     Step,
@@ -191,6 +194,15 @@ def pay(conn: sqlite3.Connection, claim_id: str, amount: float) -> None:
 
 def approval_limit(conn: sqlite3.Connection) -> float:
     return db.setting(conn, "company")["payout_approval_limit"]
+
+
+@app.post("/api/claims/{claim_id}/run", operation_id="run_agent")
+def run_agent(claim_id: str, background: BackgroundTasks, conn: Conn) -> RunStarted:
+    """Start the UnderCover Agent on a waiting claim."""
+    require_status(claim_row(conn, claim_id), "waiting")
+    thread_id = uuid.uuid4().hex
+    background.add_task(agent.run, claim_id, thread_id)
+    return RunStarted(claim_id=claim_id, thread_id=thread_id)
 
 
 @app.post("/api/claims/{claim_id}/start", operation_id="start_claim")

@@ -87,13 +87,13 @@ Builds `start_claim`, `record_step`, `record_decision`, `pay_claim` and `sign_of
 
 Replaces the hello-world agent. `run(claim_id, thread_id)` fetches the instructions, starts the claim, streams the agent and records each step. Tools wrap the six operations listed above. Adds `run_agent` to the backend and `uv run -m agent <claim_id>`. Writes the real instructions: read the claim, policy, history and wording; check dates, waiting periods, limits, deductibles and exclusions; decide; work out the payout; give two or three sentences of reasons and the section; pay when the payout is $1,000 or less.
 
-- [ ] Agent tests with a stub model (no model calls): a scripted run reads the claim, records an approval and pays; the claim ends `decided` with a payment, and the steps show each tool call and result
-- [ ] Stub-model test: an over-limit approval followed by a `pay_claim` call leaves the claim `awaiting_signoff` with no payment, and the agent receives the 409 message as the tool result
-- [ ] Test: each tool calls only the backend API (via the injected client) and the agent module imports nothing that reads `data/`
-- [ ] Test: `run_agent` returns a thread id and starts the run in the background (runner stubbed)
-- [ ] Test: `model()` uses `openai/gpt-6-luna` with low reasoning by default, and `MODEL_NAME` when set
-- [ ] One live run, with the dev backend up: `uv run -m agent CLM-1001` records a decision with a payout, reasons and a section, and `get_claim` shows the steps (this one call uses the student's OpenRouter key; a few cents, or free with `MODEL_NAME=openrouter/free`)
-- [ ] `npm run check:python` passes, coverage at or above 80%
+- [x] Agent tests with a stub model (no model calls): a scripted run reads the claim, records an approval and pays; the claim ends `decided` with a payment, and the steps show each tool call and result
+- [x] Stub-model test: an over-limit approval followed by a `pay_claim` call leaves the claim `awaiting_signoff` with no payment, and the agent receives the 409 message as the tool result
+- [x] Test: each tool calls only the backend API (via the injected client) and the agent module imports nothing that reads `data/`
+- [x] Test: `run_agent` returns a thread id and starts the run in the background (runner stubbed)
+- [x] Test: `model()` uses `openai/gpt-6-luna` with low reasoning by default, and `MODEL_NAME` when set
+- [x] One live run, with the dev backend up: `uv run -m agent CLM-1001` records a decision with a payout, reasons and a section, and `get_claim` shows the steps (this one call uses the student's OpenRouter key; a few cents, or free with `MODEL_NAME=openrouter/free`)
+- [x] `npm run check:python` passes, coverage at or above 80%
 
 ## Phase 4: Dashboard pages
 
