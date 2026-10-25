@@ -99,12 +99,12 @@ Replaces the hello-world agent. `run(claim_id, thread_id)` fetches the instructi
 
 Builds the three pages in the brand: the queue, a claim in full and the instructions. Adds the Google Fonts, the color tokens for light and dark mode, and a typed API client. Why separate from Phase 5: these pages are read-only and easy to verify; the live parts come next.
 
-- [ ] The queue lists every claim with its id, customer story summary, type, amount claimed in the form $1,250.00, and a status chip: waiting, in progress, waiting for sign-off, decided (Sea Green, Marigold, Coral, Cerulean)
-- [ ] The queue can be filtered by status, with a count for each
-- [ ] The claim page shows the story, items, documents, policy and plan, and, once decided, the decision, payout, reasons and policy section; an approval shows whether it is paid or waiting for sign-off
-- [ ] The instructions page shows the agent's instructions as read-only text, with no edit controls
-- [ ] Vitest tests for each page with `fetch` stubbed; `npm run check:ts` passes with coverage at or above 80%, strict TypeScript and no `any`
-- [ ] In the browser with the Playwright MCP server, at `npm run dev`: the queue shows 25 waiting claims; clicking CLM-1001 opens its page; the instructions page shows the same text as `GET /api/instructions`; the pages render correctly in light and dark mode
+- [x] The queue lists every claim with its id, customer story summary, type, amount claimed in the form $1,250.00, and a status chip: waiting, in progress, waiting for sign-off, decided (Sea Green, Marigold, Coral, Cerulean)
+- [x] The queue can be filtered by status, with a count for each
+- [x] The claim page shows the story, items, documents, policy and plan, and, once decided, the decision, payout, reasons and policy section; an approval shows whether it is paid or waiting for sign-off
+- [x] The instructions page shows the agent's instructions as read-only text, with no edit controls
+- [x] Vitest tests for each page with `fetch` stubbed; `npm run check:ts` passes with coverage at or above 80%, strict TypeScript and no `any`
+- [x] In the browser with Playwright (a script, as the Playwright MCP server didn't connect this session), at `npm run dev`: the queue shows 25 waiting claims; clicking CLM-1001 opens its page; the instructions page shows the same text as `GET /api/instructions`; the pages render correctly in light and dark mode
 
 ## Phase 5: Live runs and sign-off in the dashboard
 
