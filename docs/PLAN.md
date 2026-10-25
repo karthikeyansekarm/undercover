@@ -122,7 +122,7 @@ Adds the "Run agent" button on waiting claims, the step-by-step activity panel (
 
 Runs the agent over the queue to check it holds up, fixes what that turns up in the instructions or the code, and finishes the documentation. Scoring against the handlers' decisions is not part of this phase.
 
-- [ ] Live runs on at least five claims of different types each end with a recorded decision, two or three sentences of reasons and a policy section, and none crashes; any over $1,000 waits for sign-off with no payment
-- [ ] `docs/STATUS.md` describes what's built, how to run it (`npm run dev`, `uv run -m agent <claim_id>`, resetting the database) and what's not built
-- [ ] A short README in `backend/`, `agent/` and `dashboard/` only if needed beyond `docs/STATUS.md`
-- [ ] `npm run check` passes in full: ruff, pyright, pytest at 80%+, Prettier, ESLint, tsc, vitest at 80%+, and Playwright
+- [x] Live runs on at least five claims of different types each end with a recorded decision, two or three sentences of reasons and a policy section, and none crashes; any over $1,000 waits for sign-off with no payment
+- [x] `docs/STATUS.md` describes what's built, how to run it (`npm run dev`, `uv run -m agent <claim_id>`, resetting the database) and what's not built
+- [x] A short README in `backend/`, `agent/` and `dashboard/` only if needed beyond `docs/STATUS.md` (not needed)
+- [x] `npm run check` passes in full: ruff, pyright, pytest at 80%+, Prettier, ESLint, tsc, vitest at 80%+, and Playwright
