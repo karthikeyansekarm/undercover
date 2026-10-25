@@ -122,7 +122,7 @@ def steps(message: BaseMessage) -> list[tuple[str, str]]:
         found.append(("message", message.text))
     if isinstance(message, AIMessage):
         found += [
-            ("tool_call", f"{c['name']}({json.dumps(c['args'])})")
+            ("tool_call", f"{c['name']}({json.dumps(c['args'], ensure_ascii=False)})")
             for c in message.tool_calls
         ]
     return found

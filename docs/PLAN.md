@@ -108,15 +108,15 @@ Builds the three pages in the brand: the queue, a claim in full and the instruct
 
 ## Phase 5: Live runs and sign-off in the dashboard
 
-Adds the "Run agent" button on waiting claims, the step-by-step activity panel (polling every second while in progress, stopping when the run ends), and the sign-off panel with a handler picker on claims waiting for sign-off. Adds Playwright tests. For the end-to-end tests, Playwright starts the backend on its own port with a fresh database (via a small `.mjs` script, so it works on Windows) and plays the agent's part by calling the API directly, so no test calls a model.
+Adds the "Run agent" button on waiting claims, the step-by-step activity panel (polling every second while in progress, stopping when the run ends), and the sign-off panel with a handler picker on claims waiting for sign-off. Adds Playwright tests. For the end-to-end tests, Playwright starts the backend on its own port with a fresh database (a new temp file per run, set in `playwright.config.ts`) and plays the agent's part by calling the API directly, so no test calls a model.
 
-- [ ] Vitest: the steps panel renders tool calls, results and model text in order, and polling stops once the claim leaves `in_progress`
-- [ ] Vitest: the sign-off panel appears only for claims awaiting sign-off and posts the chosen handler
-- [ ] Playwright: steps posted to a claim through the API appear on its page within two seconds
-- [ ] Playwright: a claim approved at $1,250 through the API shows "Waiting for sign-off" in the queue; signing off as Dana Whitfield moves it to decided and shows the payment of $1,250.00
-- [ ] Playwright: a claim declined through the API shows the decision, reasons and section, and no payment
-- [ ] `npm run e2e` passes, and the existing health test still passes
-- [ ] In the browser with the Playwright MCP server: click "Run agent" on a waiting claim (live model), watch the steps appear, and see the decision when it finishes
+- [x] Vitest: the steps panel renders tool calls, results and model text in order, and polling stops once the claim leaves `in_progress`
+- [x] Vitest: the sign-off panel appears only for claims awaiting sign-off and posts the chosen handler
+- [x] Playwright: steps posted to a claim through the API appear on its page within two seconds
+- [x] Playwright: a claim approved at $1,250 through the API shows "Waiting for sign-off" in the queue; signing off as Dana Whitfield moves it to decided and shows the payment of $1,250.00
+- [x] Playwright: a claim declined through the API shows the decision, reasons and section, and no payment
+- [x] `npm run e2e` passes, and the existing health test still passes
+- [x] In the browser with Playwright (a script, as the MCP server didn't connect): click "Run agent" on a waiting claim (live model), watch the steps appear, and see the decision when it finishes
 
 ## Phase 6: Working the queue and handover
 

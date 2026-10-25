@@ -106,3 +106,8 @@ export async function post<T>(path: string, body: object): Promise<T> {
 export interface Text {
   text: string;
 }
+
+export interface RunStarted {
+  claim_id: string;
+  thread_id: string;
+}

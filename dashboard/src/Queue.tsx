@@ -3,12 +3,18 @@ import type { ClaimSummary, Status } from "./api";
 import { STATUSES, STATUS_LABELS, label, money } from "./format";
 import { useApi } from "./useApi";
 
+const always = () => true;
+
 export function StatusChip({ status }: Readonly<{ status: Status }>) {
   return <span className={`chip chip-${status}`}>{STATUS_LABELS[status]}</span>;
 }
 
 export function Queue() {
-  const { data: claims, error } = useApi<ClaimSummary[]>("/api/claims", 3000);
+  const { data: claims, error } = useApi<ClaimSummary[]>(
+    "/api/claims",
+    always,
+    3000,
+  );
   const [filter, setFilter] = useState<Status | "all">("all");
 
   if (error) return <p role="alert">Could not load the queue.</p>;

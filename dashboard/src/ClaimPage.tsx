@@ -1,6 +1,15 @@
-import type { Claim, Decision, Policy } from "./api";
+import { useCallback, useState } from "react";
+import {
+  post,
+  type Claim,
+  type Decision,
+  type Policy,
+  type RunStarted,
+} from "./api";
 import { label, money } from "./format";
 import { StatusChip } from "./Queue";
+import { SignOff } from "./SignOff";
+import { Steps } from "./Steps";
 import { useApi } from "./useApi";
 
 const DECISION_LABELS: Record<Decision["decision"], string> = {
@@ -121,11 +130,62 @@ export function ClaimDetails({ claim }: Readonly<{ claim: Claim }>) {
   );
 }
 
+// An approval within the limit is decided before the agent pays it.
+function awaitingPayment(c: Claim): boolean {
+  return (
+    c.status === "decided" &&
+    c.decision?.decision === "approve" &&
+    c.decision.signed_off_by === null &&
+    c.payment === null
+  );
+}
+
+function RunButton({
+  claimId,
+  onStarted,
+}: Readonly<{ claimId: string; onStarted: () => void }>) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const run = () => {
+    setBusy(true);
+    post<RunStarted>(`/api/claims/${claimId}/run`, {})
+      .then(onStarted)
+      .catch(() => {
+        setError("The agent could not start.");
+        setBusy(false);
+      });
+  };
+  return (
+    <>
+      <button type="button" className="primary" disabled={busy} onClick={run}>
+        Run agent
+      </button>
+      {error && <p role="alert">{error}</p>}
+    </>
+  );
+}
+
 export function ClaimPage({ claimId }: Readonly<{ claimId: string }>) {
-  const { data: claim, error } = useApi<Claim>(`/api/claims/${claimId}`);
+  const [started, setStarted] = useState(false);
+  const pollWhile = useCallback(
+    (c: Claim) =>
+      c.status === "in_progress" ||
+      (started && c.status === "waiting") ||
+      awaitingPayment(c),
+    [started],
+  );
+  const {
+    data: claim,
+    error,
+    reload,
+  } = useApi<Claim>(`/api/claims/${claimId}`, pollWhile);
+  const start = useCallback(() => {
+    setStarted(true);
+  }, []);
 
   if (error) return <p role="alert">Could not load claim {claimId}.</p>;
   if (!claim) return <p>Loading the claim...</p>;
+  const working = pollWhile(claim);
 
   return (
     <>
@@ -137,14 +197,21 @@ export function ClaimPage({ claimId }: Readonly<{ claimId: string }>) {
           <span className="mono">{claim.claim_id}</span> {claim.summary}
         </h2>
         <StatusChip status={claim.status} />
+        {claim.status === "waiting" && !started && (
+          <RunButton claimId={claim.claim_id} onStarted={start} />
+        )}
       </header>
       <p>{claim.customer_name}</p>
       <div className="columns">
         <div>
+          {claim.status === "awaiting_signoff" && (
+            <SignOff claim={claim} onDone={reload} />
+          )}
           <DecisionPanel claim={claim} />
           <ClaimDetails claim={claim} />
         </div>
         <div>
+          <Steps steps={claim.steps} working={working} />
           <PolicyPanel policyId={claim.policy_id} />
         </div>
       </div>
