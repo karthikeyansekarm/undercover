@@ -1,22 +1,10 @@
 import { useCallback, useState } from "react";
-import {
-  post,
-  type Claim,
-  type Decision,
-  type Policy,
-  type RunStarted,
-} from "./api";
-import { label, money } from "./format";
+import { post, type Claim, type Policy, type RunStarted } from "./api";
+import { DECISION_LABELS, label, money } from "./format";
 import { StatusChip } from "./Queue";
 import { SignOff } from "./SignOff";
 import { Steps } from "./Steps";
 import { useApi } from "./useApi";
-
-const DECISION_LABELS: Record<Decision["decision"], string> = {
-  approve: "Approved",
-  decline: "Declined",
-  refer: "Referred to a handler",
-};
 
 function PolicyPanel({ policyId }: Readonly<{ policyId: string }>) {
   const { data: policy } = useApi<Policy>(`/api/policies/${policyId}`);

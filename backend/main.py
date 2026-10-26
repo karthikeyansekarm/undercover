@@ -103,18 +103,25 @@ def health() -> dict[str, str]:
 
 @app.get("/api/claims", operation_id="list_claims")
 def list_claims(conn: Conn) -> list[ClaimSummary]:
-    """List every claim in the queue with where it stands."""
+    """List every claim in the queue with where it stands and its decision."""
     names = {
         r["customer_id"]: json.loads(r["data"])["name"]
         for r in conn.execute("SELECT * FROM customers")
     }
+    decisions = {
+        r["claim_id"]: (r["decision"], r["payout"])
+        for r in conn.execute("SELECT * FROM decisions")
+    }
     summaries = []
     for row in conn.execute("SELECT * FROM claims ORDER BY claim_id"):
         data = json.loads(row["data"])
+        kind, payout = decisions.get(row["claim_id"], (None, None))
         summaries.append(
             ClaimSummary(
                 **data | {"status": row["status"]},
                 customer_name=names[data["customer_id"]],
+                decision_kind=kind,
+                approved_amount=payout if kind == "approve" else None,
             )
         )
     return summaries

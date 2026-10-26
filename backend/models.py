@@ -29,6 +29,8 @@ class ClaimSummary(BaseModel):
     summary: str
     amount_claimed: float
     status: Status
+    decision_kind: DecisionKind | None
+    approved_amount: float | None
 
 
 class Decision(BaseModel):

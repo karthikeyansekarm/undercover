@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import { stubApi, summaries } from "./fixtures";
 import { Queue } from "./Queue";
@@ -17,6 +23,28 @@ it("lists the claims with their status and amount", async () => {
   expect(screen.getByText("Trip delay")).toBeDefined();
   expect(screen.getByText("Waiting", { selector: ".chip" })).toBeDefined();
   expect(screen.getByText("Decided", { selector: ".chip" })).toBeDefined();
+});
+
+it("shows each claim's decision and approved amount", async () => {
+  stubApi({ "/api/claims": summaries });
+  render(<Queue />);
+  const decided = await screen.findByRole("row", { name: /CLM-1002/ });
+  expect(within(decided).getByText("Approved")).toBeDefined();
+  expect(within(decided).getByText("$250.00")).toBeDefined();
+  const waiting = screen.getByRole("row", { name: /CLM-1001/ });
+  expect(within(waiting).getAllByText("-")).toHaveLength(2);
+});
+
+it("shows no approved amount for a declined claim", async () => {
+  stubApi({
+    "/api/claims": [
+      { ...summaries[1], decision_kind: "decline", approved_amount: null },
+    ],
+  });
+  render(<Queue />);
+  const row = await screen.findByRole("row", { name: /CLM-1002/ });
+  expect(within(row).getByText("Declined")).toBeDefined();
+  expect(within(row).getByText("-")).toBeDefined();
 });
 
 it("filters by status with counts", async () => {

@@ -1,5 +1,7 @@
 export type Status = "waiting" | "in_progress" | "awaiting_signoff" | "decided";
 
+export type DecisionKind = "approve" | "decline" | "refer";
+
 export interface ClaimSummary {
   claim_id: string;
   customer_name: string;
@@ -8,6 +10,8 @@ export interface ClaimSummary {
   summary: string;
   amount_claimed: number;
   status: Status;
+  decision_kind: DecisionKind | null;
+  approved_amount: number | null;
 }
 
 export interface Item {
@@ -23,7 +27,7 @@ export interface Document {
 }
 
 export interface Decision {
-  decision: "approve" | "decline" | "refer";
+  decision: DecisionKind;
   payout: number;
   reasons: string;
   policy_section: string;

@@ -1,4 +1,10 @@
-import type { Status } from "./api";
+import type { DecisionKind, Status } from "./api";
+
+export const DECISION_LABELS: Record<DecisionKind, string> = {
+  approve: "Approved",
+  decline: "Declined",
+  refer: "Referred to a handler",
+};
 
 export const STATUSES: Status[] = [
   "waiting",

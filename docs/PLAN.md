@@ -35,7 +35,7 @@ Every operation has an `operation_id`, a one-line docstring and no optional inpu
 | Method and path | operation_id | Used by |
 |---|---|---|
 | `GET /api/health` | `health` | dashboard |
-| `GET /api/claims` | `list_claims` | dashboard |
+| `GET /api/claims` | `list_claims` | dashboard (with each claim's decision and approved amount, added in Phase 7); `--all` runs |
 | `GET /api/claims/{claim_id}` | `get_claim` | both: the claim, its decision, payment and steps |
 | `GET /api/policies/{policy_id}` | `get_policy` | agent: the policy with its plan's limits and add-on details |
 | `GET /api/customers/{customer_id}/history` | `get_claim_history` | agent: earlier claims only, no contact details |
@@ -126,3 +126,20 @@ Runs the agent over the queue to check it holds up, fixes what that turns up in 
 - [x] `docs/STATUS.md` describes what's built, how to run it (`npm run dev`, `uv run -m agent <claim_id>`, resetting the database) and what's not built
 - [x] A short README in `backend/`, `agent/` and `dashboard/` only if needed beyond `docs/STATUS.md` (not needed)
 - [x] `npm run check` passes in full: ruff, pyright, pytest at 80%+, Prettier, ESLint, tsc, vitest at 80%+, and Playwright
+
+## Phase 7: After the pilot: running the whole queue, and decisions in the queue
+
+Two changes the student asked for after the pilot was handed over.
+
+**Running every waiting claim from the command line.** Clicking Run agent on many claims at once ran them in parallel, and a new OpenRouter account hit its rate limit. `uv run -m agent --all` (also `npm run agent:all`) runs every waiting claim one after another instead. It reuses `run()` for each claim, so steps, decisions and payments are recorded exactly as from the dashboard. A failed claim is printed and recorded, and the run carries on with the next one.
+
+**The decision and approved amount in the queue.** Handlers wanted to see each claim's outcome without opening it. `list_claims` now returns `decision_kind` (approve, decline, refer, or none yet) and `approved_amount` (the payout for an approval, none otherwise), read from the decisions table. The queue shows them as two new columns, Decision and Approved, next to the amount claimed.
+
+- [x] `uv run -m agent --all` (also `-all` or `all`) runs every waiting claim one at a time, skips claims that aren't waiting, prints each claim's result and a final count, and carries on after a claim's run fails; any other option starting with `-` prints a usage message
+- [x] Pytest with a stub model covers `--all`, including a failed claim; no test calls a model
+- [x] Live: `npm run agent:all` decided all 25 claims with no errors (15 approved and paid, 3 approved and waiting for sign-off, 6 declined, 3 referred)
+- [x] `GET /api/claims` returns `decision_kind` and `approved_amount`: none for an undecided claim, the payout for an approval, and no amount for a decline or referral (pytest)
+- [x] The queue has Decision and Approved columns: the decision in its color (Approved, Declined, Referred to a handler) and the approved amount as $1,250.00, or "-" when there is none (vitest)
+- [x] Playwright: the claim approved at $1,250 shows Approved and $1,250.00 in its queue row
+- [x] In the browser with a Playwright script: the queue shows the new columns in light and dark mode, with no sideways scroll at phone width
+- [x] `npm run check` passes in full

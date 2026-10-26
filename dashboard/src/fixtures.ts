@@ -10,6 +10,8 @@ export const summaries: ClaimSummary[] = [
     summary: "Flight home canceled",
     amount_claimed: 1250,
     status: "waiting",
+    decision_kind: null,
+    approved_amount: null,
   },
   {
     claim_id: "CLM-1002",
@@ -19,6 +21,8 @@ export const summaries: ClaimSummary[] = [
     summary: "Suitcase lost",
     amount_claimed: 300,
     status: "decided",
+    decision_kind: "approve",
+    approved_amount: 250,
   },
 ];
 

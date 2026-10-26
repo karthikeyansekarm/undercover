@@ -14,6 +14,8 @@ def test_list_claims(client):
     assert first["claim_type"] == "trip_delay"
     assert first["amount_claimed"] == 420.0
     assert {c["status"] for c in claims} == {"waiting"}
+    assert first["decision_kind"] is None
+    assert first["approved_amount"] is None
 
 
 def test_get_claim(client):

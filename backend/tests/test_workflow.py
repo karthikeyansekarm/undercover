@@ -165,3 +165,13 @@ def test_status_shows_in_the_queue(client):
     decide(client, payout=1250.0)
     claims = {c["claim_id"]: c for c in client.get("/api/claims").json()}
     assert claims["CLM-1001"]["status"] == "awaiting_signoff"
+    assert claims["CLM-1001"]["decision_kind"] == "approve"
+    assert claims["CLM-1001"]["approved_amount"] == 1250.0
+
+
+def test_queue_shows_no_approved_amount_for_a_decline(client):
+    start(client)
+    decide(client, decision="decline", payout=0)
+    claims = {c["claim_id"]: c for c in client.get("/api/claims").json()}
+    assert claims["CLM-1001"]["decision_kind"] == "decline"
+    assert claims["CLM-1001"]["approved_amount"] is None

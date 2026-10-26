@@ -168,6 +168,30 @@ def run(claim_id: str, thread_id: str, llm: BaseChatModel | None = None) -> str:
     return reply
 
 
+def run_all(llm: BaseChatModel | None = None) -> None:
+    """Run the agent on every waiting claim, one at a time, printing each result."""
+    with backend() as client:
+        claims = client.get("/api/claims").json()
+    waiting = [c["claim_id"] for c in claims if c["status"] == "waiting"]
+    print(f"Running the agent on {len(waiting)} waiting claims, one at a time.")
+    failed = 0
+    for claim_id in waiting:
+        try:
+            reply = run(claim_id, uuid.uuid4().hex, llm)
+        except Exception as error:
+            failed += 1
+            reply = f"The run stopped with an error: {error}"
+        print(f"{claim_id}: {reply}", flush=True)
+    print(f"Done: {len(waiting) - failed} decided, {failed} stopped with an error.")
+
+
 def main(argv: list[str]) -> None:
-    """Run the agent on the claim named on the command line."""
-    print(run(argv[1], uuid.uuid4().hex))
+    """Run the agent on the claim named on the command line, or on every waiting
+    claim with --all."""
+    arg = argv[1]
+    if arg.lstrip("-") == "all":
+        run_all()
+    elif arg.startswith("-"):
+        raise SystemExit("Usage: uv run -m agent CLM-1001, or uv run -m agent --all")
+    else:
+        print(run(arg, uuid.uuid4().hex))

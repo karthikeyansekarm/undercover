@@ -1,6 +1,12 @@
 import { useState } from "react";
 import type { ClaimSummary, Status } from "./api";
-import { STATUSES, STATUS_LABELS, label, money } from "./format";
+import {
+  DECISION_LABELS,
+  STATUSES,
+  STATUS_LABELS,
+  label,
+  money,
+} from "./format";
 import { useApi } from "./useApi";
 
 const always = () => true;
@@ -61,6 +67,8 @@ export function Queue() {
             <th>Summary</th>
             <th className="num">Claimed</th>
             <th>Status</th>
+            <th>Decision</th>
+            <th className="num">Approved</th>
           </tr>
         </thead>
         <tbody>
@@ -75,6 +83,20 @@ export function Queue() {
               <td className="num mono">{money(claim.amount_claimed)}</td>
               <td>
                 <StatusChip status={claim.status} />
+              </td>
+              <td>
+                {claim.decision_kind ? (
+                  <span className={`decision-${claim.decision_kind}`}>
+                    {DECISION_LABELS[claim.decision_kind]}
+                  </span>
+                ) : (
+                  <span className="muted">-</span>
+                )}
+              </td>
+              <td className="num mono">
+                {claim.approved_amount === null
+                  ? "-"
+                  : money(claim.approved_amount)}
               </td>
             </tr>
           ))}

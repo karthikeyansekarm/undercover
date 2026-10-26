@@ -55,6 +55,8 @@ test("a payout over $1,000 waits for a handler's sign-off", async ({
   await page.goto("/");
   const row = page.getByRole("row", { name: /CLM-1002/ });
   await expect(row.getByText("Waiting for sign-off")).toBeVisible();
+  await expect(row.getByText("Approved")).toBeVisible();
+  await expect(row.getByText("$1,250.00")).toBeVisible();
 
   await row.getByRole("link", { name: "CLM-1002" }).click();
   await expect(

@@ -104,6 +104,52 @@ def test_main(client, capsys, monkeypatch):
     assert capsys.readouterr().out.strip() == "Done."
 
 
+def test_run_all_runs_waiting_claims_and_carries_on_after_an_error(
+    client, capsys, monkeypatch
+):
+    client.post("/api/claims/CLM-1002/start", json={"thread_id": "t"})
+    waiting = [
+        c["claim_id"]
+        for c in client.get("/api/claims").json()
+        if c["status"] == "waiting"
+    ]
+    ran = []
+
+    def fake_run(claim_id, thread_id, llm=None):
+        ran.append(claim_id)
+        if claim_id == "CLM-1001":
+            raise RuntimeError("rate limited")
+        return "Decided."
+
+    monkeypatch.setattr(main, "run", fake_run)
+    main.main(["agent", "--all"])
+    assert ran == waiting
+    assert "CLM-1002" not in ran
+    out = capsys.readouterr().out
+    assert "CLM-1001: The run stopped with an error: rate limited" in out
+    assert f"Done: {len(waiting) - 1} decided, 1 stopped with an error." in out
+
+
+@pytest.mark.parametrize("arg", ["--all", "-all", "all"])
+def test_main_accepts_all_spellings(monkeypatch, arg):
+    ran = []
+    monkeypatch.setattr(main, "run_all", lambda: ran.append(True))
+    main.main(["agent", arg])
+    assert ran == [True]
+
+
+def test_main_rejects_an_unknown_option():
+    with pytest.raises(SystemExit, match="Usage"):
+        main.main(["agent", "-x"])
+
+
+def test_run_all_with_a_model(client, capsys):
+    for claim in client.get("/api/claims").json()[1:]:
+        client.post(f"/api/claims/{claim['claim_id']}/start", json={"thread_id": "t"})
+    main.run_all(stub(AIMessage(content="Referred.")))
+    assert "CLM-1001: Referred." in capsys.readouterr().out
+
+
 def test_run_agent_starts_a_background_run(client, monkeypatch):
     started = []
     monkeypatch.setattr(main, "run", lambda *args: started.append(args))
